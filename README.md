@@ -120,4 +120,5 @@ This streams live logs to your terminal so you can see webhook fire confirmation
 - The app only receives events **after** installation. It does not back-fill historical posts/comments.
 - Devvit triggers fire for content in the subreddit where the app is installed only.
 - The webhook URL is configured in **installation settings** so each subreddit can set its own endpoint.
+- Devvit currently restricts secrets to **app-scoped** settings, so installation-scoped webhook URLs are not stored as secret values.
 - If the webhook endpoint returns a non-2xx status, the error is logged in your app's Devvit console.
