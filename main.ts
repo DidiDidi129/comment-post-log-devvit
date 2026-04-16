@@ -1,4 +1,4 @@
-import { Devvit, SettingScope } from '@devvit/public-api';
+import { Devvit, SettingScope, type TriggerContext } from '@devvit/public-api';
 
 // ─── Configure required Reddit API capabilities ───────────────────────────────
 Devvit.configure({
@@ -58,17 +58,30 @@ function truncate(text: string, max: number): string {
 }
 
 /**
- * Format a Unix timestamp as an ISO-8601 string (Discord expects this).
+ * Format an epoch timestamp (seconds or milliseconds) as ISO-8601.
+ * Returns undefined if the value is invalid.
  */
-function toIso(epochSeconds: number): string {
-  return new Date(epochSeconds * 1000).toISOString();
+function toIso(epoch: number): string | undefined {
+  if (!Number.isFinite(epoch) || epoch <= 0) return undefined;
+  const epochMs = epoch >= 1_000_000_000_000 ? epoch : epoch * 1000;
+  const date = new Date(epochMs);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date.toISOString();
+}
+
+/**
+ * Devvit select settings can be returned as either a single string or string[].
+ */
+function readSelectValue(value: string | string[] | undefined, fallback: string): string {
+  if (Array.isArray(value) && value.length > 0) return value[0];
+  return value ?? fallback;
 }
 
 /**
  * Build and send the webhook payload for a post.
  */
 async function sendPostWebhook(
-  context: Devvit.Context,
+  context: TriggerContext,
   post: {
     id: string;
     title: string;
@@ -80,19 +93,23 @@ async function sendPostWebhook(
   }
 ): Promise<void> {
   const settings = await context.settings.getAll();
-  const webhookUrl = settings['webhook-url'] as string | undefined;
+  const webhookUrl = (settings['webhook-url'] as string | undefined)?.trim();
   if (!webhookUrl) {
     console.error('[webhook-scanner] No webhook URL configured — skipping post event.');
     return;
   }
 
-  const webhookType = (settings['webhook-type'] as string[] | undefined)?.[0] ?? 'discord';
+  const webhookType = readSelectValue(
+    settings['webhook-type'] as string | string[] | undefined,
+    'discord'
+  );
   const monitorPosts = settings['monitor-posts'] as boolean ?? true;
   if (!monitorPosts) return;
 
   const profileUrl = `https://www.reddit.com/user/${post.authorName}`;
   const postUrl = post.url.startsWith('http') ? post.url : `https://www.reddit.com${post.url}`;
   const bodyPreview = truncate(post.body ?? '', 1000);
+  const createdAtIso = toIso(post.createdAt);
 
   let payload: object;
 
@@ -131,7 +148,7 @@ async function sendPostWebhook(
           footer: {
             text: `New Post • r/${post.subredditName}`,
           },
-          timestamp: toIso(post.createdAt),
+          ...(createdAtIso ? { timestamp: createdAtIso } : {}),
         },
       ],
     };
@@ -148,7 +165,7 @@ async function sendPostWebhook(
         profile_url: profileUrl,
       },
       post_url: postUrl,
-      created_at: toIso(post.createdAt),
+      created_at: createdAtIso ?? null,
       markdown_summary: [
         `**New Post in r/${post.subredditName}**`,
         `**Author:** [u/${post.authorName}](${profileUrl})`,
@@ -167,7 +184,7 @@ async function sendPostWebhook(
  * Build and send the webhook payload for a comment.
  */
 async function sendCommentWebhook(
-  context: Devvit.Context,
+  context: TriggerContext,
   comment: {
     id: string;
     body: string;
@@ -180,19 +197,23 @@ async function sendCommentWebhook(
   }
 ): Promise<void> {
   const settings = await context.settings.getAll();
-  const webhookUrl = settings['webhook-url'] as string | undefined;
+  const webhookUrl = (settings['webhook-url'] as string | undefined)?.trim();
   if (!webhookUrl) {
     console.error('[webhook-scanner] No webhook URL configured — skipping comment event.');
     return;
   }
 
-  const webhookType = (settings['webhook-type'] as string[] | undefined)?.[0] ?? 'discord';
+  const webhookType = readSelectValue(
+    settings['webhook-type'] as string | string[] | undefined,
+    'discord'
+  );
   const monitorComments = settings['monitor-comments'] as boolean ?? true;
   if (!monitorComments) return;
 
   const profileUrl = `https://www.reddit.com/user/${comment.authorName}`;
   const commentUrl = `https://www.reddit.com${comment.permalink}`;
   const bodyPreview = truncate(comment.body, 1000);
+  const createdAtIso = toIso(comment.createdAt);
 
   let payload: object;
 
@@ -231,7 +252,7 @@ async function sendCommentWebhook(
           footer: {
             text: `New Comment • r/${comment.subredditName}`,
           },
-          timestamp: toIso(comment.createdAt),
+          ...(createdAtIso ? { timestamp: createdAtIso } : {}),
         },
       ],
     };
@@ -247,7 +268,7 @@ async function sendCommentWebhook(
         profile_url: profileUrl,
       },
       comment_url: commentUrl,
-      created_at: toIso(comment.createdAt),
+      created_at: createdAtIso ?? null,
       markdown_summary: [
         `**New Comment in r/${comment.subredditName}**`,
         `**Author:** [u/${comment.authorName}](${profileUrl})`,
@@ -292,15 +313,17 @@ Devvit.addTrigger({
   onEvent: async (event, context) => {
     const post = event.post;
     if (!post) return;
+    const authorName = event.author?.name ?? 'unknown';
+    const subredditName = event.subreddit?.name ?? context.subredditName ?? 'unknown';
 
-    console.log(`[webhook-scanner] PostSubmit: ${post.id} by u/${post.authorName}`);
+    console.log(`[webhook-scanner] PostSubmit: ${post.id} by u/${authorName}`);
 
     await sendPostWebhook(context, {
       id: post.id,
       title: post.title,
       body: post.selftext ?? undefined,
-      authorName: post.authorName ?? 'unknown',
-      subredditName: post.subredditName,
+      authorName,
+      subredditName,
       url: post.url,
       createdAt: post.createdAt,
     });
@@ -315,8 +338,10 @@ Devvit.addTrigger({
   onEvent: async (event, context) => {
     const comment = event.comment;
     if (!comment) return;
+    const authorName = event.author?.name ?? 'unknown';
+    const subredditName = event.subreddit?.name ?? context.subredditName ?? 'unknown';
 
-    console.log(`[webhook-scanner] CommentSubmit: ${comment.id} by u/${comment.authorName}`);
+    console.log(`[webhook-scanner] CommentSubmit: ${comment.id} by u/${authorName}`);
 
     // Optionally look up the parent post title for context
     let postTitle: string | undefined;
@@ -330,8 +355,8 @@ Devvit.addTrigger({
     await sendCommentWebhook(context, {
       id: comment.id,
       body: comment.body ?? '',
-      authorName: comment.authorName ?? 'unknown',
-      subredditName: comment.subredditName,
+      authorName,
+      subredditName,
       postId: comment.postId,
       postTitle,
       permalink: comment.permalink,
