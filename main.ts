@@ -128,26 +128,6 @@ async function sendPostWebhook(
             url: profileUrl,
             icon_url: `https://www.redditstatic.com/desktop2x/img/favicon/apple-icon-57x57.png`,
           },
-          fields: [
-            {
-              name: '📌 Subreddit',
-              value: `[r/${post.subredditName}](https://www.reddit.com/r/${post.subredditName})`,
-              inline: true,
-            },
-            {
-              name: '👤 Author',
-              value: `[u/${post.authorName}](${profileUrl})`,
-              inline: true,
-            },
-            {
-              name: '🔗 Post Link',
-              value: `[View Post](${postUrl})`,
-              inline: true,
-            },
-          ],
-          footer: {
-            text: `New Post • r/${post.subredditName}`,
-          },
           ...(createdAtIso ? { timestamp: createdAtIso } : {}),
         },
       ],
@@ -231,26 +211,6 @@ async function sendCommentWebhook(
             name: `u/${comment.authorName}`,
             url: profileUrl,
             icon_url: `https://www.redditstatic.com/desktop2x/img/favicon/apple-icon-57x57.png`,
-          },
-          fields: [
-            {
-              name: '📌 Subreddit',
-              value: `[r/${comment.subredditName}](https://www.reddit.com/r/${comment.subredditName})`,
-              inline: true,
-            },
-            {
-              name: '👤 Author',
-              value: `[u/${comment.authorName}](${profileUrl})`,
-              inline: true,
-            },
-            {
-              name: '🔗 Comment Link',
-              value: `[View Comment](${commentUrl})`,
-              inline: true,
-            },
-          ],
-          footer: {
-            text: `New Comment • r/${comment.subredditName}`,
           },
           ...(createdAtIso ? { timestamp: createdAtIso } : {}),
         },
