@@ -145,9 +145,6 @@ async function sendPostWebhook(
               inline: true,
             },
           ],
-          footer: {
-            text: `New Post • r/${post.subredditName}`,
-          },
           ...(createdAtIso ? { timestamp: createdAtIso } : {}),
         },
       ],
@@ -231,9 +228,6 @@ async function sendCommentWebhook(
             name: `u/${comment.authorName}`,
             url: profileUrl,
             icon_url: `https://www.redditstatic.com/desktop2x/img/favicon/apple-icon-57x57.png`,
-          },
-          footer: {
-            text: 'New Comment',
           },
           ...(createdAtIso ? { timestamp: createdAtIso } : {}),
         },
