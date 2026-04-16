@@ -12,9 +12,9 @@ Devvit.addSettings([
     name: 'webhook-url',
     label: 'Webhook URL',
     helpText:
-      'The URL to send POST requests to. This is app-scoped so it can be stored as a secret in Devvit.',
+      'The URL to send POST requests to for this subreddit installation.',
     type: 'string',
-    scope: SettingScope.App,
+    scope: SettingScope.Installation,
   },
   {
     name: 'webhook-type',
