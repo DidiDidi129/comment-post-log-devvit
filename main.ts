@@ -65,6 +65,14 @@ function toIso(epochSeconds: number): string {
 }
 
 /**
+ * Devvit select settings can be returned as either a single string or string[].
+ */
+function readSelectValue(value: string | string[] | undefined, fallback: string): string {
+  if (Array.isArray(value)) return value[0] ?? fallback;
+  return value ?? fallback;
+}
+
+/**
  * Build and send the webhook payload for a post.
  */
 async function sendPostWebhook(
@@ -80,13 +88,16 @@ async function sendPostWebhook(
   }
 ): Promise<void> {
   const settings = await context.settings.getAll();
-  const webhookUrl = settings['webhook-url'] as string | undefined;
+  const webhookUrl = (settings['webhook-url'] as string | undefined)?.trim();
   if (!webhookUrl) {
     console.error('[webhook-scanner] No webhook URL configured — skipping post event.');
     return;
   }
 
-  const webhookType = (settings['webhook-type'] as string[] | undefined)?.[0] ?? 'discord';
+  const webhookType = readSelectValue(
+    settings['webhook-type'] as string | string[] | undefined,
+    'discord'
+  );
   const monitorPosts = settings['monitor-posts'] as boolean ?? true;
   if (!monitorPosts) return;
 
@@ -180,13 +191,16 @@ async function sendCommentWebhook(
   }
 ): Promise<void> {
   const settings = await context.settings.getAll();
-  const webhookUrl = settings['webhook-url'] as string | undefined;
+  const webhookUrl = (settings['webhook-url'] as string | undefined)?.trim();
   if (!webhookUrl) {
     console.error('[webhook-scanner] No webhook URL configured — skipping comment event.');
     return;
   }
 
-  const webhookType = (settings['webhook-type'] as string[] | undefined)?.[0] ?? 'discord';
+  const webhookType = readSelectValue(
+    settings['webhook-type'] as string | string[] | undefined,
+    'discord'
+  );
   const monitorComments = settings['monitor-comments'] as boolean ?? true;
   if (!monitorComments) return;
 
