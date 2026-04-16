@@ -73,7 +73,7 @@ function toIso(epoch: number): string | undefined {
  * Devvit select settings can be returned as either a single string or string[].
  */
 function readSelectValue(value: string | string[] | undefined, fallback: string): string {
-  if (Array.isArray(value)) return value[0] ?? fallback;
+  if (Array.isArray(value) && value.length > 0) return value[0];
   return value ?? fallback;
 }
 
