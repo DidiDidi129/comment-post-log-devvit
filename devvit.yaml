@@ -5,4 +5,4 @@ runtime: node20
 permissions:
   - reddit.api.read
   - reddit.api.users.read
-main: src/main.ts
+main: main.ts
