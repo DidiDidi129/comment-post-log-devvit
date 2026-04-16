@@ -14,7 +14,7 @@ Devvit.addSettings([
     helpText: 'The URL to send POST requests to. Supports Discord webhooks and generic endpoints.',
     type: 'string',
     isSecret: true,
-    scope: SettingScope.App,
+    scope: SettingScope.Installation,
   },
   {
     name: 'webhook-type',
