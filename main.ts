@@ -12,9 +12,9 @@ Devvit.addSettings([
     name: 'webhook-url',
     label: 'Webhook URL',
     helpText:
-      'The URL to send POST requests to. Installation-scoped settings are not secret in Devvit, so use a webhook endpoint that can be safely stored in installation settings.',
+      'The URL to send POST requests to. This is app-scoped so it can be stored as a secret in Devvit.',
     type: 'string',
-    scope: SettingScope.Installation,
+    scope: SettingScope.App,
   },
   {
     name: 'webhook-type',
