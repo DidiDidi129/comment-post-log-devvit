@@ -232,25 +232,8 @@ async function sendCommentWebhook(
             url: profileUrl,
             icon_url: `https://www.redditstatic.com/desktop2x/img/favicon/apple-icon-57x57.png`,
           },
-          fields: [
-            {
-              name: '📌 Subreddit',
-              value: `[r/${comment.subredditName}](https://www.reddit.com/r/${comment.subredditName})`,
-              inline: true,
-            },
-            {
-              name: '👤 Author',
-              value: `[u/${comment.authorName}](${profileUrl})`,
-              inline: true,
-            },
-            {
-              name: '🔗 Comment Link',
-              value: `[View Comment](${commentUrl})`,
-              inline: true,
-            },
-          ],
           footer: {
-            text: `New Comment • r/${comment.subredditName}`,
+            text: 'New Comment',
           },
           ...(createdAtIso ? { timestamp: createdAtIso } : {}),
         },
