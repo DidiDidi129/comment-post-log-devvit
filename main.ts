@@ -14,7 +14,7 @@ Devvit.addSettings([
     helpText: 'The URL to send POST requests to. Supports Discord webhooks and generic endpoints.',
     type: 'string',
     isSecret: true,
-    scope: SettingScope.App,
+    scope: SettingScope.Installation,
   },
   {
     name: 'webhook-type',
@@ -27,7 +27,7 @@ Devvit.addSettings([
     ],
     defaultValue: ['discord'],
     multiSelect: false,
-    scope: SettingScope.App,
+    scope: SettingScope.Installation,
   },
   {
     name: 'monitor-posts',
@@ -35,7 +35,7 @@ Devvit.addSettings([
     helpText: 'Send a webhook notification when a new post is submitted.',
     type: 'boolean',
     defaultValue: true,
-    scope: SettingScope.App,
+    scope: SettingScope.Installation,
   },
   {
     name: 'monitor-comments',
@@ -43,7 +43,7 @@ Devvit.addSettings([
     helpText: 'Send a webhook notification when a new comment is submitted.',
     type: 'boolean',
     defaultValue: true,
-    scope: SettingScope.App,
+    scope: SettingScope.Installation,
   },
 ]);
 
