@@ -338,7 +338,7 @@ Devvit.addTrigger({
   onEvent: async (event, context) => {
     const comment = event.comment;
     if (!comment) return;
-    const authorName = event.author?.name ?? comment.author ?? 'unknown';
+    const authorName = event.author?.name ?? 'unknown';
     const subredditName = event.subreddit?.name ?? context.subredditName ?? 'unknown';
 
     console.log(`[webhook-scanner] CommentSubmit: ${comment.id} by u/${authorName}`);
