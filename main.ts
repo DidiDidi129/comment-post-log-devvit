@@ -128,23 +128,6 @@ async function sendPostWebhook(
             url: profileUrl,
             icon_url: `https://www.redditstatic.com/desktop2x/img/favicon/apple-icon-57x57.png`,
           },
-          fields: [
-            {
-              name: '📌 Subreddit',
-              value: `[r/${post.subredditName}](https://www.reddit.com/r/${post.subredditName})`,
-              inline: true,
-            },
-            {
-              name: '👤 Author',
-              value: `[u/${post.authorName}](${profileUrl})`,
-              inline: true,
-            },
-            {
-              name: '🔗 Post Link',
-              value: `[View Post](${postUrl})`,
-              inline: true,
-            },
-          ],
           ...(createdAtIso ? { timestamp: createdAtIso } : {}),
         },
       ],
