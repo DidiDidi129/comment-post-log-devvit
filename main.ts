@@ -12,7 +12,7 @@ Devvit.addSettings([
     name: 'webhook-url',
     label: 'Webhook URL',
     helpText:
-      'The URL to send POST requests to. Installation-scoped settings are not secret in Devvit, so use a webhook endpoint that can be safely stored in installation settings.',
+      'The URL to send POST requests to for this subreddit installation.',
     type: 'string',
     scope: SettingScope.Installation,
   },
