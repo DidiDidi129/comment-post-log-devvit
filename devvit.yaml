@@ -1,0 +1,8 @@
+name: post-commelogger
+version: 0.0.1
+slug: webhook-scanner
+runtime: node20
+permissions:
+  - reddit.api.read
+  - reddit.api.users.read
+main: src/main.ts

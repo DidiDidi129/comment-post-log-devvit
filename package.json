@@ -1,0 +1,20 @@
+{
+  "name": "post-commelogger",
+  "version": "0.0.0",
+  "description": "Scans all posts and comments in a subreddit and forwards them to a webhook.",
+  "main": "index.js",
+  "scripts": {
+    "build": "devvit build",
+    "upload": "devvit upload",
+    "playtest": "devvit playtest"
+  },
+  "dependencies": {
+    "@devvit/public-api": "0.12.19"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  },
+  "type": "module",
+  "private": true,
+  "license": "BSD-3-Clause"
+}
